@@ -47,7 +47,7 @@
 
                                             <div class="col-span-12">
                                                 <label for="access_key_id" class="block text-sm font-medium leading-5 text-gray-700">Access key ID</label>
-                                                <input required="" name="access_key_id" value="{{ old('access_key_id') }}" autocomplete="off"
+                                                <input type="password" required="" name="access_key_id" value="{{ old('access_key_id') }}" autocomplete="off"
                                                        class="@error('access_key_id') is-invalid @enderror mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
                                                 @error('access_key_id')
                                                 <div class="alert alert-danger">{{ $message }}</div>
@@ -55,7 +55,7 @@
                                             </div>
 
                                             <div class="col-span-12">
-                                                <label for="access_key" value="{{ old('access_key') }}" autocomplete="off"
+                                                <label type="password" for="access_key" value="{{ old('access_key') }}" autocomplete="off"
                                                        class="block text-sm font-medium leading-5 text-gray-700">Access key</label>
                                                 <input required="" name="access_key" class="@error('access_key') is-invalid @enderror mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
                                                 @error('access_key')
