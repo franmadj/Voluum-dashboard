@@ -45,6 +45,11 @@ class AccountController extends Controller {
             'access_key' => $request->access_key,
             'workspaces' => $request->workspaces,
         ]);
+        
+        $accounts_data = session('voluum_tokens', []);
+        unset($accounts_data[$id]);
+        session(['voluum_tokens' => $accounts_data]);
+        
         return redirect()->route('accounts');
     }
 

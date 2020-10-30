@@ -38,121 +38,33 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    Account name
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                            </tr>
+                           
+                            @foreach($data as $d)
                              <tr>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    Account name
+                                    {{$d['name']}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    0
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    0
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    {{$d['data']->conversions}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    {{$d['data']->revenue}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    {{$d['data']->cost}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
+                                    {{$d['data']->profit}}
                                 </td>
                             </tr>
-                             <tr>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    Account name
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                            </tr>
-                             <tr>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    Account name
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                            </tr>
-                             <tr>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    Account name
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                    10
-                                </td>
-                            </tr>
+                            @endforeach
+                             
 
                             <!-- More rows... -->
                         </tbody>
