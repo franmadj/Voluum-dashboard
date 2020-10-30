@@ -55,6 +55,9 @@ class AccountController extends Controller {
 
     function delete($id) {
         Account::destroy($id);
+        $accounts_data = session('voluum_tokens', []);
+        unset($accounts_data[$id]);
+        session(['voluum_tokens' => $accounts_data]);
         return redirect()->route('accounts');
     }
 
