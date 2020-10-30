@@ -129,7 +129,6 @@ class Controller extends BaseController {
     }
 
     private function request_auth_token($acc) {
-        var_dump('request_token');
         $client = new \GuzzleHttp\Client();
         $body = [];
         $body['accessId'] = $acc->access_key_id;
