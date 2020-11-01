@@ -1,0 +1,6 @@
+#reportrange{
+    background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%
+}
+#reportrange span{
+    font-size: 12px;
+}

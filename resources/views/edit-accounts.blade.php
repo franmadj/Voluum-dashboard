@@ -27,7 +27,7 @@
                             </div>
                             @endif
 
-                            <form action="/accounts/{{$account->id}}" method="POST">
+                            <form action="/accounts/{{$account->id}}" method="POST" autocomplete="off">
                                 @csrf
                                 @method('PUT')
                                 <div class="shadow overflow-hidden sm:rounded-md">
@@ -50,7 +50,7 @@
 
                                             <div class="col-span-12">
                                                 <label for="access_key_id" class="block text-sm font-medium leading-5 text-gray-700">Access key ID</label>
-                                                <input type="password" required="" name="access_key_id" value="{{ $account->access_key_id }}" autocomplete="off"
+                                                <input type="password" required="" name="access_key_id" value="{{ $account->access_key_id }}" autocomplete="new-password"
                                                        class="@error('access_key_id') is-invalid @enderror mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
                                                 @error('access_key_id')
                                                 <div class="alert alert-danger">{{ $message }}</div>
@@ -59,7 +59,7 @@
 
                                             <div class="col-span-12">
                                                 <label for="access_key" class="block text-sm font-medium leading-5 text-gray-700">Access key</label>
-                                                <input type="password" required="" name="access_key" value="{{ $account->access_key }}" autocomplete="off"
+                                                <input type="password" required="" name="access_key" value="{{ $account->access_key }}" autocomplete="new-password"
                                                        class="@error('access_key') is-invalid @enderror mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
                                                 @error('access_key')
                                                 <div class="alert alert-danger">{{ $message }}</div>
