@@ -21,7 +21,7 @@ class Controller extends BaseController {
     function dashboard() {//session(['voluum_tokens' => []]);return;
         try {
             $voluum = new Voluum();
-            $data = []; //$voluum->get_dashboard_data([]);
+            $data = $voluum->get_dashboard_data([]);
             return view('dashboard', ['data' => $data, 'daterange' => false]);
         } catch (ClientException $e) {
             echo $e->getResponse()->getReasonPhrase() . ', Something wrong with the request to the API, please check account details like api keys and workspaces';

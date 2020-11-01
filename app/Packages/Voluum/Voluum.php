@@ -6,7 +6,6 @@ use App\Models\Account;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 
-
 class Voluum {
 
     private $auth_token;
@@ -43,11 +42,11 @@ class Voluum {
         $dates = '';
         $report = [];
 
-        $dates = '&from=2020-05-20T00%3A00%3A00Z&to=2020-05-21T00%3A00%3A00Z';
+        $dates = '&from=' . date('Y-m-d', strtotime('-28 day')) . 'T00:00:00Z';
         if ($dateRange) {
-            $to=date('Y-m-d',strtotime($dateRange['date_to'].' +1 day')).'T00:00:00';
-            
-            $dates = '&from=' . urlencode($dateRange['date_from']).'&to=' . urlencode($to);
+            $to = date('Y-m-d', strtotime($dateRange['date_to'] . ' +1 day')) . 'T00:00:00Z';
+
+            $dates = '&from=' . urlencode($dateRange['date_from']) . '&to=' . urlencode($to);
         }
         $query .= $dates;
 
