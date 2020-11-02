@@ -1,6 +1,17 @@
 #reportrange{
-    background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%
+    background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    min-width: 262px;
 }
 #reportrange span{
     font-size: 12px;
+}
+.list-header{
+    display: flex;
+    align-items: center;
+}
+.refresh-dashboard{
+    margin-left: 8px;
 }

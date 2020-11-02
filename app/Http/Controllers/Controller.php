@@ -21,8 +21,8 @@ class Controller extends BaseController {
     function dashboard() {//session(['voluum_tokens' => []]);return;
         try {
             $voluum = new Voluum();
-            $data = $voluum->get_dashboard_data([]);
-            return view('dashboard', ['data' => $data, 'daterange' => false]);
+            $data = []; //$voluum->get_dashboard_data([]);
+            return view('dashboard', ['data' => $data, 'daterange' => false, 'date_from' => '', 'date_to' => '']);
         } catch (ClientException $e) {
             echo $e->getResponse()->getReasonPhrase() . ', Something wrong with the request to the API, please check account details like api keys and workspaces';
         } catch (\Exception $e) {
@@ -40,7 +40,7 @@ class Controller extends BaseController {
         $voluum = new Voluum();
         $data = $voluum->get_dashboard_data($dateRange);
 
-        return view('dashboard', ['data' => $data, 'daterange' => $request->daterange_format]);
+        return view('dashboard', ['data' => $data, 'daterange' => $request->daterange_format, 'date_from' => $request->date_from, 'date_to' => $request->date_to]);
         // } catch (ClientException $e) {
         echo $e->getResponse()->getReasonPhrase() . ', Something wrong with the request to the API, please check account details like api keys and workspaces' . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
         // } catch (\Exception $e) {
