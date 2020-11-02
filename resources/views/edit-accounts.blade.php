@@ -78,7 +78,7 @@
                                                 <div class="alert alert-danger">{{ $message }}</div>
                                                 @enderror
                                                 <p class="mt-2 text-sm text-gray-400 italic">
-                                                    Separated by coma.
+                                                    workspace_name:workspace_id Separated by coma.
                                                 </p>
                                             </div>
 
