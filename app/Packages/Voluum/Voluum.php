@@ -45,7 +45,7 @@ class Voluum {
 
     private function request_report($acc, $dates) {
         //https://api.voluum.com/report?include=ALL&groupBy=affiliateNetworkId&from=2017-05-20T00%3A00%3A00Z&workspaces=21fbb9c8-9c57-4bff-9da8-ab1fa5c932a3
-        $query = 'include=ALL&groupBy=affiliateNetworkId';
+        $query = 'include=ALL&groupBy=affiliateNetworkId&conversionTimeMode=CONVERSION';
         $base_url = "https://api.voluum.com/report?";
 
         $url = $base_url . $query . $dates;
