@@ -6,6 +6,7 @@ use App\Models\Account;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Exception\ClientException;
 
 class Voluum {
 
@@ -35,11 +36,11 @@ class Voluum {
         if ($dateRange) {
             $this->set_daterange_to_today($dateRange['date_to']);
             $from = date('Y-m-d\T', strtotime($dateRange['date_from'])) . '00:00:00Z';
-            $to = date('Y-m-d\T', strtotime($dateRange['date_to']. ' +1 days')) . '00:00:00Z';
+            $to = date('Y-m-d\T', strtotime($dateRange['date_to'] . ' +1 days')) . '00:00:00Z';
             $dates = '&from=' . urlencode($from) . '&to=' . urlencode($to);
         }
         //var_dump($dates);
-        
+
         return $dates .= '&tz=CET';
     }
 
@@ -61,9 +62,9 @@ class Voluum {
                 $workspace = array_map('trim', explode(':', $workspace));
                 $workspace_name = $workspace[0];
                 $workspace_id = isset($workspace[1]) ? $workspace[1] : $workspace[0];
-                $report['ws'][$workspace_id] = $this->query_report($url.'&workspaces=' . $workspace_id);               
+                $report['ws'][$workspace_id] = $this->query_report($url . '&workspaces=' . $workspace_id);
                 $report['ws'][$workspace_id]->name = $workspace_name;
-                $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url.'&workspaces=' . $workspace_id);
+                $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url . '&workspaces=' . $workspace_id);
             }
         }
         return $report;
@@ -73,8 +74,8 @@ class Voluum {
         $from = date('Y-m-01') . 'T00:00:00';
         $to = date('Y-m-d\T', strtotime(' +1 days')) . '00:00:00';
         $dates = '&from=' . urlencode($from) . '&to=' . urlencode($to);
-        $to_month_url .= $dates.'&tz=CET';
-        
+        $to_month_url .= $dates . '&tz=CET';
+
         //var_dump($to_month_url);
 
         if ($result = $this->query_report($to_month_url)) {
@@ -86,18 +87,22 @@ class Voluum {
     private function query_report($url) {
 //        if ($cache = $this->get_cache($url))
 //            return $cache;
-        $client = new Client();
-        $response = $client->request("GET", $url, [
-            'headers' => [
-                'Content-Type' => 'application/json; charset=utf-8',
-                'Accept' => 'application/json',
-                'CWAUTH-TOKEN' => $this->auth_token,
-        ]]);
-        $code = $response->getStatusCode();
-        if (200 == $code) {
-            $result = json_decode((string) $response->getBody())->totals;
-            //$this->set_cache($url, $result);
-            return $result;
+        try {
+            $client = new Client();
+            $response = $client->request("GET", $url, [
+                'headers' => [
+                    'Content-Type' => 'application/json; charset=utf-8',
+                    'Accept' => 'application/json',
+                    'CWAUTH-TOKEN' => $this->auth_token,
+            ]]);
+            $code = $response->getStatusCode();
+            if (200 == $code) {
+                $result = json_decode((string) $response->getBody())->totals;
+                //$this->set_cache($url, $result);
+                return $result;
+            }
+        } catch (ClientException $e) {
+            Log::debug('query_report .' . $e->getResponse()->getReasonPhrase() . ', Something wrong with the request "'.$url.'" to the API, please check account details like api keys and workspaces');
         }
         return false;
     }
@@ -109,11 +114,9 @@ class Voluum {
     }
 
     private function set_cache($url, $new_data) {
-
         if ($this->is_daterange_to_past) {
             $id = md5($url);
             $data = Storage::exists('dashboard_cache.json') ? json_decode(Storage::get('dashboard_cache.json'), true) : [];
-
             if (!isset($data[$id])) {
                 $data[$id] = $new_data;
                 Storage::put('dashboard_cache.json', json_encode($data));
@@ -136,26 +139,31 @@ class Voluum {
 
     private function get_accounts() {
         $accounts_data = session('voluum_tokens', []);
-        $accounts = Account::all();
-        if ($accounts->count()) {
+        try {
+            $accounts = Account::all();
+            if ($accounts->count()) {
 
-            $now = (new \DateTime(date('c')));
-            $tokens_updated = false;
-            foreach ($accounts as $acc) {
-                if (isset($accounts_data[$acc->id]) && $accounts_data[$acc->id]['expirationTimestamp']) {
-                    $expire = (new \DateTime($accounts_data[$acc->id]['expirationTimestamp']));
-                    if ($now > $expire) {
+                $now = (new \DateTime(date('c')));
+                $tokens_updated = false;
+                foreach ($accounts as $acc) {
+                    if (isset($accounts_data[$acc->id]) && $accounts_data[$acc->id]['expirationTimestamp']) {
+                        $expire = (new \DateTime($accounts_data[$acc->id]['expirationTimestamp']));
+                        if ($now > $expire) {
+                            $accounts_data[$acc->id] = $this->make_account_data($acc);
+                            $tokens_updated = true;
+                        }
+                    } else {
                         $accounts_data[$acc->id] = $this->make_account_data($acc);
                         $tokens_updated = true;
                     }
-                } else {
-                    $accounts_data[$acc->id] = $this->make_account_data($acc);
-                    $tokens_updated = true;
                 }
-            }
 
-            if ($tokens_updated)
-                session(['voluum_tokens' => $accounts_data]);
+                if ($tokens_updated)
+                    session(['voluum_tokens' => $accounts_data]);
+            }
+        } catch (ClientException $e) {
+            Log::debug('get_accounts .' . $e->getResponse()->getReasonPhrase());
+            
         }
         return $accounts_data;
     }
