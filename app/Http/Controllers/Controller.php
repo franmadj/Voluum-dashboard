@@ -9,25 +9,31 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use App\Packages\Voluum\Voluum;
 
-
-
 class Controller extends BaseController {
 
     use AuthorizesRequests,
         DispatchesJobs,
         ValidatesRequests;
+    
+    /**
+     * Returns data from Voluum to dashboard
+     * @return \Illuminate\Contracts\View\View
+     */
 
-    function dashboard() {//session(['voluum_tokens' => []]);return;
+    function dashboard() {
         try {
             $voluum = new Voluum();
             $data = $voluum->get_dashboard_data([]);
             return view('dashboard', ['data' => $data, 'daterange' => false, 'date_from' => '', 'date_to' => '']);
-        //} catch (ClientException $e) {
-            echo $e->getResponse()->getReasonPhrase() . ', Something wrong with the request to the API, please check account details like api keys and workspaces';
         } catch (\Exception $e) {
             echo $e->getmessage() . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
         }
     }
+    
+    /**
+     * Returns filtered data from Voluum to dashboard
+     * @return \Illuminate\Contracts\View\View
+     */
 
     function filter_dashboard(Request $request) {
         try {
@@ -38,10 +44,7 @@ class Controller extends BaseController {
 
             $voluum = new Voluum();
             $data = $voluum->get_dashboard_data($dateRange);
-
             return view('dashboard', ['data' => $data, 'daterange' => $request->daterange_format, 'date_from' => $request->date_from, 'date_to' => $request->date_to]);
-        //} catch (ClientException $e) {
-            echo $e->getResponse()->getReasonPhrase() . ', Something wrong with the request to the API, please check account details like api keys and workspaces' . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
         } catch (\Exception $e) {
             echo $e->getmessage() . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
         }

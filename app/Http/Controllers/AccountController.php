@@ -10,6 +10,12 @@ class AccountController extends Controller {
     function index() {
         return view('accounts', ['accounts' => Account::all(), 'account' => []]);
     }
+    
+    /**
+     * Store account
+     * @param Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
 
     function store(Request $request) {
         $request->validate([
@@ -30,6 +36,13 @@ class AccountController extends Controller {
     function edit($id) {
         return view('edit-accounts', ['accounts' => Account::all(), 'account' => Account::findOrFail($id)]);
     }
+    
+    /**
+     * Update Account by ID
+     * @param Illuminate\Http\Request $request
+     * @param INT $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
 
     function update(Request $request, $id) {
         $request->validate([
@@ -45,20 +58,33 @@ class AccountController extends Controller {
             'access_key' => $request->access_key,
             'workspaces' => $request->workspaces,
         ]);
-        
-        $accounts_data = session('voluum_tokens', []);
-        unset($accounts_data[$id]);
-        session(['voluum_tokens' => $accounts_data]);
-        
+        $this->reset_session_accounts($id);
+
         return redirect()->route('accounts');
     }
+    
+    /**
+     * 
+     * @param INT $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
 
     function delete($id) {
         Account::destroy($id);
+        $this->reset_session_accounts($id);
+        return redirect()->route('accounts');
+    }
+    
+    /**
+     * resets the session with the current account data
+     * @param type $id the account id just for the session array
+     */
+    
+    protected function reset_session_accounts($id){
         $accounts_data = session('voluum_tokens', []);
         unset($accounts_data[$id]);
         session(['voluum_tokens' => $accounts_data]);
-        return redirect()->route('accounts');
+        
     }
 
 }
