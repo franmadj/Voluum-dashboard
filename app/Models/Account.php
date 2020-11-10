@@ -10,4 +10,9 @@ class Account extends Model
     use HasFactory;
     
     protected $guarded = [];
+    
+    public function path()
+    {
+        return '/accounts/' . $this->id;
+    }
 }
