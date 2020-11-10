@@ -1,41 +1,42 @@
-<p>Voluum Dashboard</p>
+<h1>Voluum Dashboard</h1>
 
 ## Requirements
+<ul>
+<li>PHP >= 7.3</li>
 
-PHP >= 7.3
+<li>BCMath PHP Extension</li>
 
-BCMath PHP Extension
+<li>Ctype PHP Extension</li>
 
-Ctype PHP Extension
+<li>Fileinfo PHP Extension</li>
 
-Fileinfo PHP Extension
+<li>JSON PHP Extension</li>
 
-JSON PHP Extension
+<li>Mbstring PHP Extension</li>
 
-Mbstring PHP Extension
+<li>OpenSSL PHP Extension</li>
 
-OpenSSL PHP Extension
+<li>PDO PHP Extension</li>
 
-PDO PHP Extension
+<li>Tokenizer PHP Extension</li>
 
-Tokenizer PHP Extension
-
-XML PHP Extension
-
+<li>XML PHP Extension</li>
+</ul>
 
 ## Installation
 
 From root folder:
+<ul>
+<li>cp .env.example .env</li>
 
-cp .env.example .env
+<li>composer install</li>
 
-composer install
+<li>php artisan key:generate</li>
 
-php artisan key:generate
+<li>php artisan migrate</li>
 
-php artisan migrate
+<li>npm install</li>
 
-npm install
-
-npm run dev
+<li>npm run dev</li>
+</ul>
 
