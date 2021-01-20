@@ -26,6 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [Controller::class, 'dashboard'])->name('dashboard');
     Route::post('/dashboard', [Controller::class, 'filter_dashboard'])->name('filter.dashboard');
     
+    Route::get('/get-data/{id}', [Controller::class, 'get_data'])->name('get');
+    
     
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts');
     Route::get('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('edit.accounts');

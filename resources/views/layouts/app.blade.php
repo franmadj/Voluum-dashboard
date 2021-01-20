@@ -13,6 +13,8 @@
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+        
+
 
         @livewireStyles
 
@@ -23,7 +25,7 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-        <script type="text/javascript" src="{{ asset('js/custom.js') }}"></script>
+        
 
 
     </head>
@@ -41,5 +43,6 @@
         @stack('modals')
 
         @livewireScripts
+        <script type="text/javascript" src="{{ asset('js/custom.js') }}"></script>
     </body>
 </html>

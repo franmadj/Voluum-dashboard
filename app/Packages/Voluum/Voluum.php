@@ -9,63 +9,60 @@ use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Exception\ClientException;
 
 class Voluum {
-    
+
     /**
      *
      * @var String Token for the current account the call API is for
      */
     private $auth_token;
-    
+
     /**
      *
      * @var Array Holds Accounts data 
      */
     private $accounts_data;
-    
+
     /**
      *
      * @var Boolean Determines if the required API data does not reach the present time.
      */
     private $is_daterange_to_past = true;
-    
+
     /**
      * Voluum domain API
      * @var String 
      */
-    private $domain_api="https://api.voluum.com";
-    
-    
-    
+    private $domain_api = "https://api.voluum.com";
+
     /**
      * sets the accounts data
      */
-
     public function __construct() {
         $this->accounts_data = $this->get_accounts();
     }
-    
+
     /**
      * First layer to Get data from Voluum API
      * @param Array $dateRange array with date_from and date_to to get the data from
      * @return Array
      */
-
-    public function get_dashboard_data($dateRange) {
+    public function get_dashboard_data($dateRange, $account_id = NULL) {
         $dates = $this->get_date_ranges($dateRange);
         foreach ($this->accounts_data as $key => $acc) {
+            if ($account_id && $account_id != $key)
+                continue;
             $this->auth_token = $acc['token'];
             $data = $this->request_report($acc, $dates);
             $this->accounts_data[$key]['data'] = $data;
         }
         return $this->accounts_data;
     }
-    
+
     /**
      * Converts dates into Voluum get query string parameters
      * @param Array $dateRange array with date_from and date_to to get the data from
      * @return String
      */
-
     private function get_date_ranges($dateRange) {
         $dates = '';
         $dates = '&from=' . date('Y-m-d') . 'T00:00:00Z';
@@ -77,17 +74,16 @@ class Voluum {
         }
         return $dates .= '&tz=CET';
     }
-    
+
     /**
      * For each account Builds data returned from Voluum
      * @param Array $acc the single account data
      * @param String $dates the query string parameters for dates
      * @return Array
      */
-
     private function request_report($acc, $dates) {
         $query = 'include=ALL&groupBy=affiliateNetworkId&conversionTimeMode=CONVERSION';
-        $base_url = $this->domain_api."/report?";
+        $base_url = $this->domain_api . "/report?";
         $url = $base_url . $query . $dates;
         $to_month_url = $base_url . $query;
         $report = [];
@@ -99,19 +95,21 @@ class Voluum {
                 $workspace_name = $workspace[0];
                 $workspace_id = isset($workspace[1]) ? $workspace[1] : $workspace[0];
                 $report['ws'][$workspace_id] = $this->query_report($url . '&workspaces=' . $workspace_id);
+                if (!$report['ws'][$workspace_id])
+                    continue;
                 $report['ws'][$workspace_id]->name = $workspace_name;
+                $report['ws'][$workspace_id]->id = substr(md5($workspace_name), 0, 4);
                 $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url . '&workspaces=' . $workspace_id);
             }
         }
         return $report;
     }
-    
+
     /**
      * Gets Voluum profit value for the current month
      * @param string $to_month_url base API query url
      * @return int Profit value
      */
-
     private function get_month_profit($to_month_url) {
         $from = date('Y-m-01') . 'T00:00:00';
         $to = date('Y-m-d\T', strtotime(' +1 days')) . '00:00:00';
@@ -122,13 +120,12 @@ class Voluum {
         }
         return 0;
     }
-    
+
     /**
      * Query the Voluum API to get the report data
      * @param string $url the url to call the API
      * @return boolean false if not data is found | Object with totals if data is found
      */
-
     private function query_report($url) {
         try {
             $client = new Client();
@@ -144,16 +141,15 @@ class Voluum {
                 return $result;
             }
         } catch (ClientException $e) {
-            Log::debug('query_report .' . $e->getResponse()->getReasonPhrase() . ', Something wrong with the request "'.$url.'" to the API, please check account details like api keys and workspaces');
+            Log::debug('query_report .' . $e->getResponse()->getReasonPhrase() . ', Something wrong with the request "' . $url . '" to the API, please check account details like api keys and workspaces');
         }
         return false;
     }
-    
+
     /**
      * Determines if the required data does not reach the present time.
      * @param String $date_to
      */
-
     private function set_daterange_to_today($date_to) {
         $this->is_daterange_to_past = date('Y-m-d') > date('Y-m-d', strtotime($date_to));
     }
@@ -181,12 +177,11 @@ class Voluum {
         }
         return false;
     }
-    
+
     /**
      * Set session and returns data with the current accounts added in the database along with the token generated from the API to make future queries
      * @return Array with all accounts
      */
-
     private function get_accounts() {
         $accounts_data = session('voluum_tokens', []);
         try {
@@ -213,17 +208,15 @@ class Voluum {
             }
         } catch (ClientException $e) {
             Log::debug('get_accounts .' . $e->getResponse()->getReasonPhrase());
-            
         }
         return $accounts_data;
     }
-    
+
     /**
      * Builds data for each account
      * @param Array $acc account Model
      * @return Array new account data from the API
      */
-
     private function make_account_data($acc) {
         $response = $this->request_auth_token($acc);
         $tokens = [];
@@ -238,19 +231,18 @@ class Voluum {
         //Log::debug('data Account .' . print_r($logs, true));
         return $tokens;
     }
-    
+
     /**
      * Query the Voluum API to get the account token
      * @param Array $acc Account Model with access keys
      * @return boolean false when not data is returned | Object when data return from the API
      */
-
     private function request_auth_token($acc) {
         $client = new Client();
         $body = [];
         $body['accessId'] = $acc->access_key_id;
         $body['accessKey'] = $acc->access_key;
-        $url = $this->domain_api."/auth/access/session";
+        $url = $this->domain_api . "/auth/access/session";
         $response = $client->request("POST", $url, [
             'json' => $body,
             'headers' => [
@@ -266,5 +258,4 @@ class Voluum {
         return false;
     }
 
-    
 }

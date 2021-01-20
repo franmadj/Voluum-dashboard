@@ -7,7 +7,7 @@
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Replace with your content -->
-            <div class="border-4 border-dashed border-gray-200 rounded-lg">
+            <div class="border-4 border-dashed border-gray-200 rounded-lg frame-sh">
                 <form action="/dashboard" method="POST" id="form-reportrange">
                     @csrf 
                     <input type="hidden" id="date_from" name="date_from" @if($date_from) value="{{$date_from}}" @endif>
@@ -25,76 +25,11 @@
                                     </a>
                                 </div>
                                 <script type="text/javascript">
-                                    $(function () {
+                                    
+var accounts = '{{$accounts}}'.split(',');
+console.log(accounts);
 
-                                    var start = moment();
-                                    var end = moment();
-                                    function cb(start, end) {
-                                        @if($daterange)
-                                                $('#reportrange span').html('{{$daterange}}');
-                                        @else
-                                                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                                        @endif
-                                    }
-
-                                    $('#reportrange').daterangepicker({
-                                    //                            timePicker: true,
-                                    //                            timePicker24Hour: true,
-                                    startDate: start,
-                                            endDate: end,
-                                            alwaysShowCalendars: true,
-                                            showCustomRangeLabel:true,
-                                            timePickerIncrement:true,
-                                            ranges: {
-                                            'Today': [moment(), moment()],
-                                                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                                                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                                                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                                                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                                            }
-                                    }, cb);
-                                    cb(start, end);
-                                    $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
-                                        var date_from=picker.startDate.format('YYYY-MM-DD');
-                                        var date_to=picker.endDate.format('YYYY-MM-DD');
-                                        
-                                        console.log(date_from);
-                                        console.log(date_to);
-
-
-                                        var display_date=picker.startDate.format('MMMM D, YYYY') + ' - ' + picker.endDate.format('MMMM D, YYYY');
-                                        //$('#reportrange span').html(display_date);
-                                        $('#date_from').val(date_from);
-                                        $('#date_to').val(date_to);
-                                        $('#daterange_format').val(display_date);
-                                        $('#form-reportrange').submit();
-                                    });
                                     
-                                    $('.refresh-dashboard').click(function(e){
-                                        e.preventDefault();
-                                        do_refresh()
-                                        
-                                    });
-                                    
-                                    
-                                    setTimeout(function(){
-                                        do_refresh()
-                                    },60000);
-                                    
-                                    function do_refresh(){ 
-                                        @if(!$daterange)
-                                           
-                                            window.location.reload();
-                                        @else
-                                           
-                                            $('#form-reportrange').submit();
-                                        @endif
-                                        
-                                    }
-                                    
-                                    
-                                    });
                                 </script>
 
 
@@ -125,123 +60,16 @@
                                             <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                                 Profit
                                             </th>
-                                            
+
                                             <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                                 Month Profit
                                             </th>
-                                            
-                                            
+
+
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        @php $visits=$clicks=$conversions=$revenue=$cost=$profit=$month_profit=0; @endphp
+                                    <tbody class="bg-white divide-y divide-gray-200 ws-content">
 
-                                        @foreach($data as $d)
-                                        @foreach($d['data'] as $key=>$value)
-
-                                        @if('accc'==$key)
-
-                                        
-
-                                        <tr class='account bg-gray-300'>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$d['name']}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$value->visits}}
-
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$value->clicks}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$value->conversions}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($value->revenue,2)}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($value->cost,2)}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($value->profit,2)}}
-                                            </td>
-                                        </tr>
-
-                                        @elseif('ws'==$key)
-
-                                        @foreach($value as $key=>$workspace)
-                                        
-                                        @php 
-                                        $visits+=$workspace->visits;
-                                        $clicks+=$workspace->clicks;
-                                        $conversions+=$workspace->conversions;
-                                        $revenue+=$workspace->revenue;
-                                        $cost+=$workspace->cost;
-                                        $profit+=$workspace->profit;
-                                        $month_profit+=$workspace->month_profit;
-                                        @endphp
-                                        
-                                        <tr class='workspace'>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$workspace->name}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$workspace->visits}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$workspace->clicks}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                {{$workspace->conversions}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($workspace->revenue,2)}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($workspace->cost,2)}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($workspace->profit,2)}}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ {{number_format($workspace->month_profit,2)}}
-                                            </td>
-                                        </tr>
-
-                                        @endforeach
-
-                                        @endif
-
-                                        @endforeach
-                                        @endforeach
-
-                                        <tr class='totals bg-teal-200'>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                Totals...
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                @php echo $visits; @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                @php echo $clicks; @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                @php echo $conversions; @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ @php echo number_format($revenue,2); @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ @php echo number_format($cost,2); @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ @php echo number_format($profit,2); @endphp
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-no-wrap text-left text-xs">
-                                                $ @php echo number_format($month_profit,2); @endphp
-                                            </td>
-                                        </tr>
 
 
 
