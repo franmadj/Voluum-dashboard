@@ -1,6 +1,9 @@
-var myEle = document.getElementById("form-reportrange");
-if (myEle)
+var form = document.getElementById("form-reportrange");
+if (form)
     $(function () {
+
+        var action = $(form).data('action');
+        _dd(action);
 
         var start = moment();
         var end = moment();
@@ -29,8 +32,8 @@ if (myEle)
         $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
             var date_from = picker.startDate.format('YYYY-MM-DD');
             var date_to = picker.endDate.format('YYYY-MM-DD');
-            console.log(date_from);
-            console.log(date_to);
+            _dd(date_from);
+            _dd(date_to);
             var display_date = picker.startDate.format('MMMM D, YYYY') + ' - ' + picker.endDate.format('MMMM D, YYYY');
             //$('#reportrange span').html(display_date);
             $('#date_from').val(date_from);
@@ -52,19 +55,22 @@ if (myEle)
 
         for (const key in accounts) {
 
-            $.get('/get-data/' + accounts[key], function (resp) {
+            $.get('/get-data/' + accounts[key] + '/' + action, function (resp) {
                 var rows = '';
                 for (const ws in resp.data.ws) {
                     if (!resp.data.ws[ws]) {
                         continue;
                     }
+                    if (action != 'network')
+                        rows += create_row(resp.data.ws[ws], true);
+                    else
+                        rows += create_row_net(resp.data.ws[ws], true);
 
-                    rows += create_row(resp.data.ws[ws], true);
                 }
-                ;
+
                 $('.ws-content').append(rows);
                 rows_done++;
-                console.log(rows_done);
+                _dd(rows_done);
                 if (rows_done >= accounts.length) {
                     var totals = add_totals(true);
                     $('.ws-content').append(totals);
@@ -80,6 +86,7 @@ if (myEle)
         }, 60000);
 
         function update_data() {
+            $('.refresh-dashboard').animateRotate(360, 5000, 'linear', function () {});
             visits = clicks = conversions = revenue = cost = profit = month_profit = rows_done = 0;
 
 
@@ -89,18 +96,22 @@ if (myEle)
 
             }
             for (const key in accounts)
-                $.get('/get-data/' + accounts[key], data, function (resp) {
+                $.get('/get-data/' + accounts[key] + '/' + action, data, function (resp) {
                     var rows = '';
                     for (const ws in resp.data.ws) {
                         if (!resp.data.ws[ws]) {
                             continue;
                         }
-                        create_row(resp.data.ws[ws], false);
+                        if (action != 'network')
+                            rows += create_row(resp.data.ws[ws], false);
+                        else
+                            rows += create_row_net(resp.data.ws[ws], false);
+
                     }
-                    ;
+
 
                     rows_done++;
-                    console.log(rows_done);
+                    _dd(rows_done);
                     if (rows_done == accounts.length) {
                         add_totals(false);
                         //$('.ws-content').append(totals);
@@ -116,9 +127,11 @@ if (myEle)
             time_out = setTimeout(function () {
 
                 update_data();
-                console.log('update data');
+                _dd('update data');
             }, 60000);
         }
+        
+        
 
 
 
@@ -129,6 +142,7 @@ const format_options = {style: 'currency', currency: 'USD'};
 const  number_format = new Intl.NumberFormat('en-US', format_options);
 
 function create_row(ws, html) {
+    _dd('create_row');
     var id = ws['id'];
 
 
@@ -184,7 +198,6 @@ function create_row(ws, html) {
     $('.profit-' + id).text(profit_).addClass('new-data');
     $('.month_profit-' + id).text(month_profit_).addClass('new-data');
 }
-
 function add_totals(html) {
 
     revenue = number_format.format(revenue.toFixed(2));
@@ -238,3 +251,107 @@ function add_totals(html) {
 
 
 }
+
+
+function create_row_net(ws, html) {
+    _dd('create_row_net');
+    var id = ws['id'];
+    let row = `<tr class='workspace bg-gray-200'>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs name-${id}">
+                                                ${ws['name']}
+                                            </td><td colspan="7"></td></tr>`;
+
+    for (const net in ws.networks) {
+        network = ws.networks[net];
+
+        _dd(network);
+
+        var revenue_ = number_format.format(network['revenue'].toFixed(2));
+        var cost_ = number_format.format(network['cost'].toFixed(2));
+        var profit_ = number_format.format(network['profit'].toFixed(2));
+        var month_profit_ = number_format.format(network['month_profit'].toFixed(2));
+
+        _dd('*****************conversions******************');
+
+        _dd(parseFloat(network['conversions']));
+
+        visits += parseFloat(network['visits']);
+        clicks += parseFloat(network['clicks']);
+        conversions += parseFloat(network['conversions']);
+        revenue += parseFloat(network['revenue']);
+        cost += parseFloat(network['cost']);
+        profit += parseFloat(network['profit']);
+        month_profit += parseFloat(network['month_profit']);
+
+        var net_id = network['affiliateNetworkId'];
+
+        if (html) {
+            row += `<tr class='workspace'>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs net-name-${net_id}">
+                                                ${network['affiliateNetworkName']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs visits-${net_id}">
+                                                ${network['visits']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs clicks-${net_id}">
+                                                ${network['clicks']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs conversions-${net_id}">
+                                                ${network['conversions']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs revenue-${net_id}">
+                                                ${revenue_} 
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs cost-${net_id}">
+                                                ${cost_}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs profit-${net_id}">
+                                                ${profit_}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs month_profit-${net_id}">
+                                                ${month_profit_}
+                                            </td>
+                                        </tr>`;
+        } else {
+
+            $('.name-' + net_id).text(ws['name']).addClass('new-data');
+            $('.net-name-' + net_id).text(network['affiliateNetworkName']).addClass('new-data');
+
+            $('.visits-' + net_id).text(network['visits']).addClass('new-data');
+            $('.clicks-' + net_id).text(network['clicks']).addClass('new-data');
+            $('.conversions-' + net_id).text(network['conversions']).addClass('new-data');
+            $('.revenue-' + net_id).text(revenue_).addClass('new-data');
+            $('.cost-' + net_id).text(cost_).addClass('new-data');
+            $('.profit-' + net_id).text(profit_).addClass('new-data');
+            $('.month_profit-' + net_id).text(month_profit_).addClass('new-data');
+        }
+
+    }
+    if (html)
+        return row;
+
+
+
+
+}
+
+function _dd(val) {
+    return;
+    console.log(val);
+
+}
+
+$.fn.animateRotate = function (angle, duration, easing, complete) {
+    var args = $.speed(duration, easing, complete);
+    var step = args.step;
+    return this.each(function (i, e) {
+        args.complete = $.proxy(args.complete, e);
+        args.step = function (now) {
+            $.style(e, 'transform', 'rotate(' + now + 'deg)');
+            if (step)
+                return step.apply(e, arguments);
+        };
+
+        $({deg: 0}).animate({deg: angle}, args);
+    });
+};

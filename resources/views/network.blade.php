@@ -8,7 +8,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Replace with your content -->
             <div class="border-4 border-dashed border-gray-200 rounded-lg frame-sh">
-                <form action="/dashboard" method="POST" id="form-reportrange" data-action="dashboard">
+                <form action="/dashboard" method="POST" id="form-reportrange" data-action="network">
                     @csrf 
                     <input type="hidden" id="date_from" name="date_from" >
                         <input type="hidden" id="date_to" name="date_to" >
@@ -68,7 +68,7 @@ console.log(accounts);
 
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 ws-content">
+                                    <tbody class="bg-white divide-y divide-gray-200 ws-content ws-content-network">
 
 
 

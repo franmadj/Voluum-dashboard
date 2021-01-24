@@ -35,10 +35,20 @@ class Voluum {
     private $domain_api = "https://api.voluum.com";
 
     /**
+     * type of data to retreive
+     * @var String 
+     */
+    private $data_type = 'dashboard';
+
+    /**
      * sets the accounts data
      */
     public function __construct() {
         $this->accounts_data = $this->get_accounts();
+    }
+
+    private function is_dashboard() {
+        return $this->data_type == 'dashboard';
     }
 
     /**
@@ -46,7 +56,8 @@ class Voluum {
      * @param Array $dateRange array with date_from and date_to to get the data from
      * @return Array
      */
-    public function get_dashboard_data($dateRange, $account_id = NULL) {
+    public function get_dashboard_data($dateRange, $account_id = NULL, $type) {
+        $this->data_type = $type;
         $dates = $this->get_date_ranges($dateRange);
         foreach ($this->accounts_data as $key => $acc) {
             if ($account_id && $account_id != $key)
@@ -94,12 +105,26 @@ class Voluum {
                 $workspace = array_map('trim', explode(':', $workspace));
                 $workspace_name = $workspace[0];
                 $workspace_id = isset($workspace[1]) ? $workspace[1] : $workspace[0];
-                $report['ws'][$workspace_id] = $this->query_report($url . '&workspaces=' . $workspace_id);
-                if (!$report['ws'][$workspace_id])
-                    continue;
+                $result = $this->query_report($url . '&workspaces=' . $workspace_id);
+                if ($this->is_dashboard()) {
+
+                    $report['ws'][$workspace_id] = $result->totals;
+                    //var_dump($report['ws'][$workspace_id]);
+                    if (!$report['ws'][$workspace_id])
+                        continue;
+
+                    $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url . '&workspaces=' . $workspace_id);
+                } else {
+
+                    $data = new \stdClass();
+                    //$data->networks =$result->rows;
+                    $data->networks = $this->get_network_month_profit($to_month_url . '&workspaces=' . $workspace_id, $result->rows);
+
+                    $report['ws'][$workspace_id] = $data;
+                    //$data->profit = $this->set_network_profit($data->networks);
+                }
                 $report['ws'][$workspace_id]->name = $workspace_name;
                 $report['ws'][$workspace_id]->id = substr(md5($workspace_name), 0, 4);
-                $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url . '&workspaces=' . $workspace_id);
             }
         }
         return $report;
@@ -115,7 +140,7 @@ class Voluum {
         $to = date('Y-m-d\T', strtotime(' +1 days')) . '00:00:00';
         $dates = '&from=' . urlencode($from) . '&to=' . urlencode($to);
         $to_month_url .= $dates . '&tz=CET';
-        if ($result = $this->query_report($to_month_url)) {
+        if ($result = $this->query_report($to_month_url)->totals) {
             return $result->profit;
         }
         return 0;
@@ -137,13 +162,28 @@ class Voluum {
             ]]);
             $code = $response->getStatusCode();
             if (200 == $code) {
-                $result = json_decode((string) $response->getBody())->totals;
+                $result = json_decode((string) $response->getBody());
                 return $result;
             }
         } catch (ClientException $e) {
             Log::debug('query_report .' . $e->getResponse()->getReasonPhrase() . ', Something wrong with the request "' . $url . '" to the API, please check account details like api keys and workspaces');
         }
         return false;
+    }
+
+    private function get_network_month_profit($to_month_url, $rows) {
+
+
+        $from = date('Y-m-01') . 'T00:00:00';
+        $to = date('Y-m-d\T', strtotime(' +1 days')) . '00:00:00';
+        $dates = '&from=' . urlencode($from) . '&to=' . urlencode($to);
+        $to_month_url .= $dates . '&tz=CET';
+        if ($networks = $this->query_report($to_month_url)->rows) {
+            foreach ($networks as $key => $net) {
+                $rows[$key]->month_profit = $net->profit;
+            }
+        }
+        return $rows;
     }
 
     /**

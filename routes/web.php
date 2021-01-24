@@ -26,7 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [Controller::class, 'dashboard'])->name('dashboard');
     Route::post('/dashboard', [Controller::class, 'filter_dashboard'])->name('filter.dashboard');
     
-    Route::get('/get-data/{id}', [Controller::class, 'get_data'])->name('get');
+    Route::get('/networks', [Controller::class, 'networks'])->name('networks');
+    
+    Route::get('/get-data/{id}/{type}', [Controller::class, 'get_data'])->name('get.data');
     
     
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts');

@@ -16,6 +16,10 @@
                         {{ __('Dashboard') }}
                     </x-jet-nav-link>
                     
+                    <x-jet-nav-link href="{{ route('networks') }}" :active="request()->routeIs('networks')">
+                        {{ __('Networks') }}
+                    </x-jet-nav-link>
+                    
                     <x-jet-nav-link href="{{ route('accounts') }}" :active="request()->routeIs('accounts')">
                         {{ __('Accounts') }}
                     </x-jet-nav-link>
