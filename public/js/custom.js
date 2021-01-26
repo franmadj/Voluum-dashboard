@@ -61,10 +61,12 @@ if (form)
                     if (!resp.data.ws[ws]) {
                         continue;
                     }
-                    if (action != 'network')
+                    if (action == 'dashboard')
                         rows += create_row(resp.data.ws[ws], true);
-                    else
+                    else if (action == 'network')
                         rows += create_row_net(resp.data.ws[ws], true);
+                    else if (action == 'traffic-source')
+                        rows += create_row_traffic(resp.data.ws[ws], true);
 
                 }
 
@@ -102,10 +104,12 @@ if (form)
                         if (!resp.data.ws[ws]) {
                             continue;
                         }
-                        if (action != 'network')
+                        if (action == 'dashboard')
                             rows += create_row(resp.data.ws[ws], false);
-                        else
+                        else if (action == 'network')
                             rows += create_row_net(resp.data.ws[ws], false);
+                        else if (action == 'traffic-source')
+                            rows += create_row_traffic(resp.data.ws[ws], false);
 
                     }
 
@@ -130,8 +134,8 @@ if (form)
                 _dd('update data');
             }, 60000);
         }
-        
-        
+
+
 
 
 
@@ -320,6 +324,92 @@ function create_row_net(ws, html) {
             $('.visits-' + net_id).text(network['visits']).addClass('new-data');
             $('.clicks-' + net_id).text(network['clicks']).addClass('new-data');
             $('.conversions-' + net_id).text(network['conversions']).addClass('new-data');
+            $('.revenue-' + net_id).text(revenue_).addClass('new-data');
+            $('.cost-' + net_id).text(cost_).addClass('new-data');
+            $('.profit-' + net_id).text(profit_).addClass('new-data');
+            $('.month_profit-' + net_id).text(month_profit_).addClass('new-data');
+        }
+
+    }
+    if (html)
+        return row;
+
+
+
+
+}
+
+function create_row_traffic(ws, html) {
+    _dd('create_row_traffic');
+    var id = ws['id'];
+    let row = `<tr class='workspace bg-gray-200'>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs name-${id}">
+                                                ${ws['name']}
+                                            </td><td colspan="7"></td></tr>`;
+
+    for (const key in ws.traffic) {
+        var traffic = ws.traffic[key];
+
+        _dd(traffic);
+
+        var revenue_ = number_format.format(traffic['revenue'].toFixed(2));
+        var cost_ = number_format.format(traffic['cost'].toFixed(2));
+        var profit_ = number_format.format(traffic['profit'].toFixed(2));
+        var month_profit_ = number_format.format(traffic['month_profit'].toFixed(2));
+
+        _dd('*****************conversions******************');
+        _dd(parseFloat(traffic['conversions']));
+
+        visits += parseFloat(traffic['visits']);
+        clicks += parseFloat(traffic['clicks']);
+        conversions += parseFloat(traffic['conversions']);
+        revenue += parseFloat(traffic['revenue']);
+        cost += parseFloat(traffic['cost']);
+        profit += parseFloat(traffic['profit']);
+        month_profit += parseFloat(traffic['month_profit']);
+
+        var net_id = traffic['trafficSourceId'];
+        
+        _dd('html***');
+        _dd(html);
+
+        if (html) {
+            row += `<tr class='workspace'>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs net-name-${net_id}">
+                                                ${traffic['trafficSourceName']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs visits-${net_id}">
+                                                ${traffic['visits']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs clicks-${net_id}">
+                                                ${traffic['clicks']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs conversions-${net_id}">
+                                                ${traffic['conversions']}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs revenue-${net_id}">
+                                                ${revenue_} 
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs cost-${net_id}">
+                                                ${cost_}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs profit-${net_id}">
+                                                ${profit_}
+                                            </td>
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs month_profit-${net_id}">
+                                                ${month_profit_}
+                                            </td>
+                                        </tr>`;
+        } else {
+            
+            console.log('else******','.visits-' + net_id,traffic['visits']);
+
+            $('.name-' + id).text(ws['name']).addClass('new-data');
+            $('.net-name-' + net_id).text(traffic['trafficSourceName']).addClass('new-data');
+
+            $('.visits-' + net_id).text(traffic['visits']).addClass('new-data');
+            $('.clicks-' + net_id).text(traffic['clicks']).addClass('new-data');
+            $('.conversions-' + net_id).text(traffic['conversions']).addClass('new-data');
             $('.revenue-' + net_id).text(revenue_).addClass('new-data');
             $('.cost-' + net_id).text(cost_).addClass('new-data');
             $('.profit-' + net_id).text(profit_).addClass('new-data');

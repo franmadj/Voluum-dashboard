@@ -45,6 +45,19 @@ class Controller extends BaseController {
             echo $e->getmessage() . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
         }
     }
+    
+    function traffic_source() {
+        try {
+            $accounts = Account::all();
+            $accs = [];
+            foreach ($accounts as $account) {
+                $accs[] = $account->id;
+            }
+            return view('traffic-source', ['accounts' => implode(',', $accs)]);
+        } catch (\Exception $e) {
+            echo $e->getmessage() . ' At file: ' . $e->getFile() . ' At line: ' . $e->getLine();
+        }
+    }
 
     function get_data(Request $request, $id, $type) {
         try {

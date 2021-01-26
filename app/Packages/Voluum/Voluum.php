@@ -51,6 +51,14 @@ class Voluum {
         return $this->data_type == 'dashboard';
     }
 
+    private function is_network() {
+        return $this->data_type == 'network';
+    }
+
+    private function is_traffic_soruce() {
+        return $this->data_type == 'traffic-source';
+    }
+
     /**
      * First layer to Get data from Voluum API
      * @param Array $dateRange array with date_from and date_to to get the data from
@@ -93,7 +101,8 @@ class Voluum {
      * @return Array
      */
     private function request_report($acc, $dates) {
-        $query = 'include=ALL&groupBy=affiliateNetworkId&conversionTimeMode=CONVERSION';
+        $groupBy = $this->is_traffic_soruce() ? 'trafficSourceId' : 'affiliateNetworkId';
+        $query = 'include=ALL&groupBy='.$groupBy.'&conversionTimeMode=CONVERSION';
         $base_url = $this->domain_api . "/report?";
         $url = $base_url . $query . $dates;
         $to_month_url = $base_url . $query;
@@ -106,6 +115,7 @@ class Voluum {
                 $workspace_name = $workspace[0];
                 $workspace_id = isset($workspace[1]) ? $workspace[1] : $workspace[0];
                 $result = $this->query_report($url . '&workspaces=' . $workspace_id);
+
                 if ($this->is_dashboard()) {
 
                     $report['ws'][$workspace_id] = $result->totals;
@@ -114,13 +124,25 @@ class Voluum {
                         continue;
 
                     $report['ws'][$workspace_id]->month_profit = $this->get_month_profit($to_month_url . '&workspaces=' . $workspace_id);
-                } else {
+                } else if ($this->is_network()) {
 
                     $data = new \stdClass();
                     //$data->networks =$result->rows;
-                    $data->networks = $this->get_network_month_profit($to_month_url . '&workspaces=' . $workspace_id, $result->rows);
+                    $data->networks = $this->get_data_month_profit($to_month_url . '&workspaces=' . $workspace_id, $result->rows);
 
                     $report['ws'][$workspace_id] = $data;
+                    //$data->profit = $this->set_network_profit($data->networks);
+                } else if ($this->is_traffic_soruce()) {
+
+                    //var_dump($result->rows);
+
+                    $data = new \stdClass();
+                    //$data->networks =$result->rows;
+
+                    $data->traffic = $this->get_data_month_profit($to_month_url . '&workspaces=' . $workspace_id, $result->rows);
+
+                    $report['ws'][$workspace_id] = $data;
+
                     //$data->profit = $this->set_network_profit($data->networks);
                 }
                 $report['ws'][$workspace_id]->name = $workspace_name;
@@ -171,16 +193,16 @@ class Voluum {
         return false;
     }
 
-    private function get_network_month_profit($to_month_url, $rows) {
+    private function get_data_month_profit($to_month_url, $rows) {
 
 
         $from = date('Y-m-01') . 'T00:00:00';
         $to = date('Y-m-d\T', strtotime(' +1 days')) . '00:00:00';
         $dates = '&from=' . urlencode($from) . '&to=' . urlencode($to);
         $to_month_url .= $dates . '&tz=CET';
-        if ($networks = $this->query_report($to_month_url)->rows) {
-            foreach ($networks as $key => $net) {
-                $rows[$key]->month_profit = $net->profit;
+        if ($data = $this->query_report($to_month_url)->rows) {
+            foreach ($data as $key => $item) {
+                $rows[$key]->month_profit = $item->profit;
             }
         }
         return $rows;
