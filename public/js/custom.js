@@ -318,8 +318,8 @@ function create_row_net(ws, html) {
                                         </tr>`;
         } else {
 
-            $('.name-' + net_id).text(ws['name']).addClass('new-data');
-            $('.net-name-' + net_id).text(network['affiliateNetworkName']).addClass('new-data');
+            //$('.name-' + net_id).text(ws['name']).addClass('new-data');
+            //$('.net-name-' + net_id).text(network['affiliateNetworkName']).addClass('new-data');
 
             $('.visits-' + net_id).text(network['visits']).addClass('new-data');
             $('.clicks-' + net_id).text(network['clicks']).addClass('new-data');
@@ -343,9 +343,31 @@ function create_row_traffic(ws, html) {
     _dd('create_row_traffic');
     var id = ws['id'];
     let row = `<tr class='workspace bg-gray-200'>
-                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs name-${id}">
+                                            <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
                                                 ${ws['name']}
-                                            </td><td colspan="7"></td></tr>`;
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Visits
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Clicks
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Conversions
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Revenue
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Costs
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Profit
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Month Profit
+                                            </td>
+<td colspan="7"></td></tr>`;
 
     for (const key in ws.traffic) {
         var traffic = ws.traffic[key];
@@ -368,7 +390,7 @@ function create_row_traffic(ws, html) {
         profit += parseFloat(traffic['profit']);
         month_profit += parseFloat(traffic['month_profit']);
 
-        var net_id = traffic['trafficSourceId'];
+        var net_id = traffic['trafficSourceId']+id;
         
         _dd('html***');
         _dd(html);
@@ -402,10 +424,10 @@ function create_row_traffic(ws, html) {
                                         </tr>`;
         } else {
             
-            console.log('else******','.visits-' + net_id,traffic['visits']);
+            _dd('else******','.visits-' + net_id,traffic['visits']);
 
-            $('.name-' + id).text(ws['name']).addClass('new-data');
-            $('.net-name-' + net_id).text(traffic['trafficSourceName']).addClass('new-data');
+            //$('.name-' + id).text(ws['name']).addClass('new-data');
+            //$('.net-name-' + net_id).text(traffic['trafficSourceName']).addClass('new-data');
 
             $('.visits-' + net_id).text(traffic['visits']).addClass('new-data');
             $('.clicks-' + net_id).text(traffic['clicks']).addClass('new-data');
