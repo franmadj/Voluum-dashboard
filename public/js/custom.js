@@ -263,7 +263,29 @@ function create_row_net(ws, html) {
     let row = `<tr class='workspace bg-gray-200'>
                                             <td class="px-6 py-1 whitespace-no-wrap text-left text-xs name-${id}">
                                                 ${ws['name']}
-                                            </td><td colspan="7"></td></tr>`;
+                                            </td>
+<td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Visits
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Clicks
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Conversions
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Revenue
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Costs
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Profit
+                                            </td>
+    <td class="px-6 py-1 whitespace-no-wrap text-left text-xs">
+                                                Month Profit
+                                            </td>
+<td colspan="7"></td></tr>`;
 
     for (const net in ws.networks) {
         network = ws.networks[net];
@@ -287,7 +309,7 @@ function create_row_net(ws, html) {
         profit += parseFloat(network['profit']);
         month_profit += parseFloat(network['month_profit']);
 
-        var net_id = network['affiliateNetworkId'];
+        var net_id = network['affiliateNetworkId']+id;
 
         if (html) {
             row += `<tr class='workspace'>

@@ -102,7 +102,7 @@ class Voluum {
      */
     private function request_report($acc, $dates) {
         $groupBy = $this->is_traffic_soruce() ? 'trafficSourceId' : 'affiliateNetworkId';
-        $query = 'include=ALL&groupBy='.$groupBy.'&conversionTimeMode=CONVERSION';
+        $query = 'include=ALL&groupBy='.$groupBy.'&conversionTimeMode=CONVERSION&sort=revenue&direction=DESC';
         $base_url = $this->domain_api . "/report?";
         $url = $base_url . $query . $dates;
         $to_month_url = $base_url . $query;
